@@ -340,11 +340,14 @@ if uploaded_file is not None:
     if st.button("🤖 Analyze Resume"):
 
         try:
-            result = analyze_resume({
-               "resume_text": resume_text,
-                "job_description": job_description
-            })
+            class ResumeData:
+                def __init__(self, resume_text, job_description):
+                    self.resume_text = resume_text
+                    self.job_description = job_description
 
+            data = ResumeData(resume_text, job_description)
+
+            result = analyze_resume(data)
             st.subheader("🤖 AI Feedback")
 
             ai_feedback = result["feedback"]
