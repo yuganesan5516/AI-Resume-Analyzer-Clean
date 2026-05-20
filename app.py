@@ -340,10 +340,10 @@ if uploaded_file is not None:
     if st.button("🤖 Analyze Resume"):
 
         try:
-            result = analyze_resume(
-                resume_text,
-                job_description
-            )
+            result = analyze_resume({
+               "resume_text": resume_text,
+                "job_description": job_description
+            })
 
             st.subheader("🤖 AI Feedback")
 
