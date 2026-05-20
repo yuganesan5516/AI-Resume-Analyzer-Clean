@@ -1,0 +1,10 @@
+streamlit
+fastapi
+uvicorn
+groq
+pydantic
+PyPDF2
+matplotlib
+fpdf
+requests
+sqlite3
