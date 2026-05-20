@@ -1,10 +1,10 @@
 import streamlit as st
-import requests
 import PyPDF2
 import matplotlib.pyplot as plt
 from groq import Groq
 from fpdf import FPDF
 from auth import create_user, login_user
+from api import analyze_resume
 
 # GROQ API KEY
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
@@ -341,15 +341,10 @@ if uploaded_file is not None:
 
         try:
 
-            response = requests.post(
-                "http://127.0.0.1:8000/analyze",
-                json={
-                    "resume_text": resume_text,
-                    "job_description": job_description
-                }
+           result = analyze_resume(
+               resume_text,
+               job_description
             )
-
-            result = response.json()
 
             st.subheader("🤖 AI Feedback")
 
