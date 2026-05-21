@@ -90,16 +90,6 @@ section[data-testid="stFileUploader"]:hover {
     box-shadow: 0 0 10px rgba(0,255,200,0.1);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #00DBDE;
-    border-radius: 10px;
-}
-
 /* Mobile Responsive */
 @media screen and (max-width: 768px) {
 
@@ -263,15 +253,33 @@ if st.sidebar.button("🚪 Logout"):
 
     st.rerun()
 
-# SKILLS
-skills = [
+# SKILLS DATABASE
+skills_db = [
     "Python",
     "Java",
-    "SQL",
+    "C",
+    "C++",
+    "JavaScript",
     "HTML",
     "CSS",
+    "React",
+    "Node.js",
+    "SQL",
+    "MongoDB",
     "Machine Learning",
-    "AI"
+    "Deep Learning",
+    "AI",
+    "Data Science",
+    "Power BI",
+    "Excel",
+    "Git",
+    "Docker",
+    "AWS",
+    "Flask",
+    "Django",
+    "TensorFlow",
+    "Pandas",
+    "NumPy"
 ]
 
 # FILE UPLOAD TITLE
@@ -327,34 +335,57 @@ if uploaded_file is not None:
         height=250
     )
 
-    # DETECT SKILLS
+    # EXTRACT SKILLS FROM JOB DESCRIPTION
+    job_skills = []
+
+    if job_description:
+
+        for skill in skills_db:
+
+            if skill.lower() in job_description.lower():
+
+                job_skills.append(skill)
+
+    # DEFAULT SKILLS IF JD EMPTY
+    if len(job_skills) == 0:
+
+        job_skills = skills_db[:7]
+
+    # MATCHING SKILLS
     found_skills = []
 
-    for skill in skills:
+    for skill in job_skills:
 
         if skill.lower() in resume_text.lower():
 
             found_skills.append(skill)
 
-    # ATS SCORE
-    score = int(
-        (len(found_skills) / len(skills)) * 100
-    )
-
     # MISSING SKILLS
     missing_skills = []
 
-    for skill in skills:
+    for skill in job_skills:
 
         if skill not in found_skills:
 
             missing_skills.append(skill)
 
-    # METRICS
+    # ATS SCORE
+    if len(job_skills) > 0:
+
+        score = int(
+            (len(found_skills) / len(job_skills)) * 100
+        )
+
+    else:
+
+        score = 0
+
+    # COUNTS
     found_count = len(found_skills)
 
     missing_count = len(missing_skills)
 
+    # METRICS
     m1, m2, m3, m4 = st.columns(4)
 
     with m1:
@@ -464,13 +495,13 @@ if uploaded_file is not None:
 
     skill_counts = [
         1 if skill in found_skills else 0
-        for skill in skills
+        for skill in job_skills
     ]
 
     fig2, ax2 = plt.subplots()
 
     ax2.bar(
-        skills,
+        job_skills,
         skill_counts
     )
 
@@ -512,11 +543,15 @@ if uploaded_file is not None:
                 )
 
                 try:
+
                     result = analyze_resume(data)
+
                     ai_feedback = result["feedback"]
 
                 except Exception as ai_error:
+
                     st.error(f"AI Error: {ai_error}")
+
                     st.stop()
 
                 st.subheader("🤖 AI Feedback")
@@ -541,7 +576,10 @@ if uploaded_file is not None:
 
                 pdf.add_page()
 
-                pdf.set_font("Arial", size=16)
+                pdf.set_font(
+                    "Arial",
+                    size=16
+                )
 
                 pdf.cell(
                     200,
@@ -553,7 +591,10 @@ if uploaded_file is not None:
 
                 pdf.ln(10)
 
-                pdf.set_font("Arial", size=12)
+                pdf.set_font(
+                    "Arial",
+                    size=12
+                )
 
                 pdf.cell(
                     200,
@@ -561,6 +602,42 @@ if uploaded_file is not None:
                     txt=f"ATS Score: {score}%",
                     ln=True
                 )
+
+                pdf.ln(5)
+
+                pdf.cell(
+                    200,
+                    10,
+                    txt="Matching Skills:",
+                    ln=True
+                )
+
+                for skill in found_skills:
+
+                    pdf.cell(
+                        200,
+                        10,
+                        txt=f"- {skill}",
+                        ln=True
+                    )
+
+                pdf.ln(5)
+
+                pdf.cell(
+                    200,
+                    10,
+                    txt="Missing Skills:",
+                    ln=True
+                )
+
+                for skill in missing_skills:
+
+                    pdf.cell(
+                        200,
+                        10,
+                        txt=f"- {skill}",
+                        ln=True
+                    )
 
                 pdf.ln(5)
 
