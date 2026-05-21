@@ -6,6 +6,14 @@ from fpdf import FPDF
 from auth import create_user, login_user
 from api import analyze_resume
 
+# PAGE CONFIG
+st.set_page_config(
+    page_title="AI Resume Analyzer",
+    page_icon="🚀",
+    layout="wide"
+)
+
+# CUSTOM CSS
 st.markdown("""
 <style>
 
@@ -36,14 +44,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# GROQ API KEY
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-
-st.set_page_config(
-    page_title="AI Resume Analyzer",
-    page_icon="🚀",
-    layout="wide"
+# GROQ API
+client = Groq(
+    api_key=st.secrets["GROQ_API_KEY"]
 )
+
 # SESSION
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -117,7 +122,10 @@ if not st.session_state.logged_in:
 
     st.stop()
 
+# MAIN TITLE
 st.title("🚀 AI Resume Analyzer")
+
+# SIDEBAR
 with st.sidebar:
 
     st.title("🚀 AI Resume Analyzer")
@@ -133,14 +141,15 @@ with st.sidebar:
     st.markdown("---")
 
     st.success("🔥 Built with Streamlit + Groq AI")
-# Logout Button
+
+# LOGOUT
 if st.sidebar.button("🚪 Logout"):
 
     st.session_state.logged_in = False
 
     st.rerun()
 
-# Skills List
+# SKILLS
 skills = [
     "Python",
     "Java",
@@ -148,92 +157,109 @@ skills = [
     "HTML",
     "CSS",
     "Machine Learning",
-    "AI",
+    "AI"
 ]
 
-# Upload Resume
+# FILE UPLOAD
 uploaded_file = st.file_uploader(
     "📄 Upload Your Resume",
     type=["pdf"]
 )
 
-# Job Description
+# JOB DESCRIPTION
 job_description = st.text_area(
     "💼 Paste Job Description"
 )
-# Show Job Description
+
+# SHOW JOB DESCRIPTION
 if job_description:
+
     st.subheader("📄 Job Description")
+
     st.write(job_description)
 
 resume_text = ""
 
+# IF FILE UPLOADED
 if uploaded_file is not None:
 
-    # Read PDF
+    # READ PDF
     pdf_reader = PyPDF2.PdfReader(uploaded_file)
 
     for page in pdf_reader.pages:
+
         resume_text += page.extract_text()
 
-    # Resume Content
+    # SHOW RESUME
     st.subheader("📄 Resume Content")
 
     st.text_area(
         "Resume Extracted Text",
         resume_text,
         height=250
-    )   
+    )
 
-    # Skill Detection
+    # DETECT SKILLS
     found_skills = []
 
     for skill in skills:
+
         if skill.lower() in resume_text.lower():
+
             found_skills.append(skill)
 
-    # ATS Score
+    # ATS SCORE
     score = int(
         (len(found_skills) / len(skills)) * 100
     )
 
-    # Missing Skills
+    # MISSING SKILLS
     missing_skills = []
 
     for skill in skills:
-        if skill not in found_skills:
-            missing_skills.append(skill)
-    # Dashboard Metrics
 
+        if skill not in found_skills:
+
+            missing_skills.append(skill)
+
+    # METRICS
     total_skills = len(skills)
+
     found_count = len(found_skills)
+
     missing_count = len(missing_skills)
 
     m1, m2, m3, m4 = st.columns(4)
 
     with m1:
+
         st.metric(
             label="📊 ATS Score",
             value=f"{score}%"
         )
 
     with m2:
+
         st.metric(
             label="✅ Skills Found",
             value=found_count
         )
 
     with m3:
+
         st.metric(
             label="❌ Missing Skills",
             value=missing_count
         )
 
     with m4:
+
         if score >= 70:
             status = "Excellent 🔥"
+
         elif score >= 40:
             status = "Good 👍"
+
         else:
             status = "Low 😢"
 
@@ -245,7 +271,7 @@ if uploaded_file is not None:
     # DASHBOARD
     col1, col2 = st.columns(2)
 
-    # LEFT SIDE
+    # LEFT
     with col1:
 
         st.subheader("📊 ATS Score")
@@ -256,19 +282,6 @@ if uploaded_file is not None:
             label="Resume Match",
             value=f"{score}%"
         )
-
-        # Color Card
-        if score >= 70:
-            bg_color = "#00FFAA"
-            text = "Excellent Match 🔥"
-
-        elif score >= 40:
-            bg_color = "#FFD700"
-            text = "Good Match 👍"
-
-        else:
-            bg_color = "#FF4B4B"
-            text = "Low Match 😢"
 
         st.markdown(f"""
         <div style="
@@ -289,14 +302,14 @@ if uploaded_file is not None:
 
         </div>
         """, unsafe_allow_html=True)
-    # RIGHT SIDE
-    with col2:
 
-        st.subheader("✅ Detected Skills")
+    # RIGHT
+    with col2:
 
         st.subheader("✅ Matching Skills")
 
         for skill in found_skills:
+
             st.markdown(f"""
             <span style="
                 background-color:#00cc66;
@@ -314,6 +327,7 @@ if uploaded_file is not None:
         st.subheader("❌ Missing Skills")
 
         for skill in missing_skills:
+
             st.markdown(f"""
             <span style="
                 background-color:#ff4b4b;
@@ -327,13 +341,16 @@ if uploaded_file is not None:
             {skill}
             </span>
             """, unsafe_allow_html=True)
-        # Pie Chart
+
+        # PIE CHART
         st.subheader("📊 Skills Analysis Chart")
 
         matched_count = len(found_skills)
+
         missing_count = len(missing_skills)
 
         labels = ["Matched Skills", "Missing Skills"]
+
         sizes = [matched_count, missing_count]
 
         fig, ax = plt.subplots()
@@ -349,8 +366,7 @@ if uploaded_file is not None:
 
         st.pyplot(fig)
 
-        # Bar Chart
-
+    # BAR CHART
     st.subheader("📈 Skills Bar Chart")
 
     skill_counts = [
@@ -366,130 +382,153 @@ if uploaded_file is not None:
     )
 
     ax2.set_ylabel("Skill Match")
+
     ax2.set_xlabel("Skills")
 
     st.pyplot(fig2)
 
-                
-
-    # Recommendations
-    st.subheader(
-        "🚀 Recommended Skills To Learn"
-    )
+    # RECOMMENDATIONS
+    st.subheader("🚀 Recommended Skills To Learn")
 
     for skill in missing_skills:
+
         st.write("👉 Learn:", skill)
 
-    # AI Analyze Button
-    # AI Analyze Button
+    # AI ANALYZE BUTTON
     if st.button("🤖 Analyze Resume"):
+
         with st.spinner("Analyzing Resume..."):
 
-        try:
-            class ResumeData:
-                def __init__(self, resume_text, job_description):
-                    self.resume_text = resume_text
-                    self.job_description = job_description
+            try:
 
-            data = ResumeData(resume_text, job_description)
+                class ResumeData:
 
-            result = analyze_resume(data)
-            st.subheader("🤖 AI Feedback")
+                    def __init__(
+                        self,
+                        resume_text,
+                        job_description
+                    ):
 
-            ai_feedback = result["feedback"]
+                        self.resume_text = resume_text
 
-            st.markdown(f"""
-            <div style="
-            background-color:#111827;
-            padding:20px;
-            border-radius:15px;
-            border:1px solid #00ff99;
-            box-shadow:0 0 15px #00ff99;
-            color:white;
-            font-size:16px;
-            line-height:1.8;
-            ">
-            {ai_feedback}
-            </div>
-            """, unsafe_allow_html=True)
+                        self.job_description = job_description
 
-            # PDF Download Feature
+                data = ResumeData(
+                    resume_text,
+                    job_description
+                )
 
-            pdf = FPDF()
-            pdf.add_page()
+                result = analyze_resume(data)
 
-            pdf.set_font("Arial", size=16)
-            pdf.cell(
-                200,
-                10,
-                txt="AI Resume Analysis Report",
-                ln=True,
-                align='C'
-            )
+                st.subheader("🤖 AI Feedback")
 
-            pdf.ln(10)
+                ai_feedback = result["feedback"]
 
-            pdf.set_font("Arial", size=12)
+                st.markdown(f"""
+                <div style="
+                background-color:#111827;
+                padding:20px;
+                border-radius:15px;
+                border:1px solid #00ff99;
+                box-shadow:0 0 15px #00ff99;
+                color:white;
+                font-size:16px;
+                line-height:1.8;
+                ">
+                {ai_feedback}
+                </div>
+                """, unsafe_allow_html=True)
 
-            pdf.cell(
-                200,
-                10,
-                txt=f"ATS Score: {score}%",
-                ln=True
-            )
+                # PDF
+                pdf = FPDF()
 
-            pdf.ln(5)
+                pdf.add_page()
 
-            pdf.cell(
-                200,
-                10,
-                txt="Detected Skills:",
-                ln=True
-            )
+                pdf.set_font(
+                    "Arial",
+                    size=16
+                )
 
-            for skill in found_skills:
                 pdf.cell(
                     200,
                     10,
-                    txt=f"- {skill}",
-                    ln=True
+                    txt="AI Resume Analysis Report",
+                    ln=True,
+                    align='C'
                 )
 
-            pdf.ln(5)
+                pdf.ln(10)
 
-            pdf.cell(
-                200,
-                10,
-                txt="Missing Skills:",
-                ln=True
-            )
+                pdf.set_font(
+                    "Arial",
+                    size=12
+                )
 
-            for skill in missing_skills:
                 pdf.cell(
                     200,
                     10,
-                    txt=f"- {skill}",
+                    txt=f"ATS Score: {score}%",
                     ln=True
                 )
 
-            pdf.ln(5)
+                pdf.ln(5)
 
-            pdf.multi_cell(
-                0,
-                10,
-                txt=ai_feedback
-            )
-
-            pdf.output("resume_report.pdf")
-
-            with open("resume_report.pdf", "rb") as file:
-
-                st.download_button(
-                    label="📄 Download Report",
-                    data=file,
-                    file_name="resume_report.pdf",
-                    mime="application/pdf"
+                pdf.cell(
+                    200,
+                    10,
+                    txt="Detected Skills:",
+                    ln=True
                 )
 
-        except Exception as e:
-            st.error(e)
+                for skill in found_skills:
+
+                    pdf.cell(
+                        200,
+                        10,
+                        txt=f"- {skill}",
+                        ln=True
+                    )
+
+                pdf.ln(5)
+
+                pdf.cell(
+                    200,
+                    10,
+                    txt="Missing Skills:",
+                    ln=True
+                )
+
+                for skill in missing_skills:
+
+                    pdf.cell(
+                        200,
+                        10,
+                        txt=f"- {skill}",
+                        ln=True
+                    )
+
+                pdf.ln(5)
+
+                pdf.multi_cell(
+                    0,
+                    10,
+                    txt=ai_feedback
+                )
+
+                pdf.output("resume_report.pdf")
+
+                with open(
+                    "resume_report.pdf",
+                    "rb"
+                ) as file:
+
+                    st.download_button(
+                        label="📄 Download Report",
+                        data=file,
+                        file_name="resume_report.pdf",
+                        mime="application/pdf"
+                    )
+
+            except Exception as e:
+
+                st.error(e)
