@@ -14,35 +14,154 @@ st.set_page_config(
 )
 
 # CUSTOM CSS
+st.set_page_config(
+    page_title="AI Resume Analyzer",
+    page_icon="🚀",
+    layout="wide"
+)
+
+# CUSTOM CSS
 st.markdown("""
 <style>
 
-.main {
-    background: linear-gradient(to right, #0f172a, #1e293b);
+/* Main Background */
+.stApp {
+    background: linear-gradient(to right, #0f172a, #020617);
     color: white;
 }
 
-.stButton>button {
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: #111827;
+    border-right: 1px solid #1f2937;
+}
+
+/* Titles */
+h1, h2, h3 {
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Buttons */
+.stButton > button {
+    width: 100%;
+    height: 3em;
+    border: none;
+    border-radius: 15px;
     background: linear-gradient(90deg,#00DBDE,#FC00FF);
     color: white;
-    border-radius: 12px;
-    height: 3em;
-    width: 100%;
     font-size: 18px;
     font-weight: bold;
-    border: none;
+    transition: 0.3s;
+    box-shadow: 0 0 15px rgba(252,0,255,0.5);
 }
 
+.stButton > button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 25px rgba(0,219,222,0.8);
+}
+
+/* Text Input */
+.stTextInput input {
+    border-radius: 12px;
+    background-color: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+}
+
+/* Text Area */
 .stTextArea textarea {
     border-radius: 12px;
+    background-color: #1e293b;
+    color: white;
+    border: 1px solid #334155;
 }
 
-.stFileUploader {
+/* File Uploader */
+section[data-testid="stFileUploader"] {
+    background-color: #111827;
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #334155;
+}
+
+/* Metric Cards */
+[data-testid="metric-container"] {
+    background: #111827;
+    border: 1px solid #1f2937;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 0 10px rgba(0,255,200,0.1);
+}
+
+/* Success Box */
+.stSuccess {
     border-radius: 12px;
+}
+
+/* Error Box */
+.stError {
+    border-radius: 12px;
+}
+
+/* Info Box */
+.stInfo {
+    border-radius: 12px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00DBDE;
+    border-radius: 10px;
 }
 
 </style>
 """, unsafe_allow_html=True)
+/* MOBILE RESPONSIVE */
+
+@media screen and (max-width: 768px) {
+
+    h1 {
+        font-size: 28px !important;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 22px !important;
+    }
+
+    h3 {
+        font-size: 18px !important;
+    }
+
+    .stButton > button {
+        font-size: 16px;
+        height: 2.8em;
+    }
+
+    [data-testid="metric-container"] {
+        padding: 15px;
+    }
+
+    section[data-testid="stSidebar"] {
+        width: 100% !important;
+    }
+
+    .block-container {
+        padding-top: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .stTextInput input,
+    .stTextArea textarea {
+        font-size: 16px;
+    }
+}
 
 # GROQ API
 client = Groq(
@@ -128,7 +247,11 @@ st.title("🚀 AI Resume Analyzer")
 # SIDEBAR
 with st.sidebar:
 
-    st.title("🚀 AI Resume Analyzer")
+    st.markdown("""
+    <h1 style='text-align:center;'>
+        🚀 AI Resume Analyzer
+    </h1>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -141,6 +264,18 @@ with st.sidebar:
     st.markdown("---")
 
     st.success("🔥 Built with Streamlit + Groq AI")
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div style="
+        text-align:center;
+        color:gray;
+        font-size:14px;
+    ">
+    Developed by Yuganesan ⚡
+    </div>
+    """, unsafe_allow_html=True)
 
 # LOGOUT
 if st.sidebar.button("🚪 Logout"):
@@ -229,7 +364,8 @@ if uploaded_file is not None:
 
     missing_count = len(missing_skills)
 
-    m1, m2, m3, m4 = st.columns(4)
+    m1, m2 = st.columns(2)
+    m3, m4 = st.columns(2)
 
     with m1:
 
@@ -269,7 +405,8 @@ if uploaded_file is not None:
         )
 
     # DASHBOARD
-    col1, col2 = st.columns(2)
+    col1 = st.container()
+    col2 = st.container()
 
     # LEFT
     with col1:

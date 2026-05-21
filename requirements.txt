@@ -7,3 +7,5 @@ PyPDF2
 matplotlib
 fpdf
 requests
+streamlit-option-menu
+streamlit-lottie
