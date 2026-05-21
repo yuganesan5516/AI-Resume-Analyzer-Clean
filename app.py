@@ -6,6 +6,36 @@ from fpdf import FPDF
 from auth import create_user, login_user
 from api import analyze_resume
 
+st.markdown("""
+<style>
+
+.main {
+    background: linear-gradient(to right, #0f172a, #1e293b);
+    color: white;
+}
+
+.stButton>button {
+    background: linear-gradient(90deg,#00DBDE,#FC00FF);
+    color: white;
+    border-radius: 12px;
+    height: 3em;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+}
+
+.stTextArea textarea {
+    border-radius: 12px;
+}
+
+.stFileUploader {
+    border-radius: 12px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # GROQ API KEY
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
@@ -88,6 +118,21 @@ if not st.session_state.logged_in:
     st.stop()
 
 st.title("🚀 AI Resume Analyzer")
+with st.sidebar:
+
+    st.title("🚀 AI Resume Analyzer")
+
+    st.markdown("---")
+
+    st.info("""
+    Upload your resume,
+    compare with job description,
+    and get AI-powered ATS feedback.
+    """)
+
+    st.markdown("---")
+
+    st.success("🔥 Built with Streamlit + Groq AI")
 # Logout Button
 if st.sidebar.button("🚪 Logout"):
 
@@ -338,6 +383,7 @@ if uploaded_file is not None:
     # AI Analyze Button
     # AI Analyze Button
     if st.button("🤖 Analyze Resume"):
+        with st.spinner("Analyzing Resume..."):
 
         try:
             class ResumeData:
