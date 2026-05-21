@@ -162,6 +162,43 @@ section[data-testid="stFileUploader"] {
         font-size: 16px;
     }
 }
+/* MODERN FILE UPLOADER */
+
+section[data-testid="stFileUploader"] {
+    background: rgba(17, 24, 39, 0.8);
+    border: 2px dashed #00DBDE;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    transition: 0.3s;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0,219,222,0.2);
+}
+
+section[data-testid="stFileUploader"]:hover {
+    border: 2px dashed #FC00FF;
+    box-shadow: 0 0 30px rgba(252,0,255,0.4);
+    transform: scale(1.01);
+}
+
+/* Upload Text */
+
+section[data-testid="stFileUploader"] label div {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Browse files button */
+
+section[data-testid="stFileUploader"] button {
+    background: linear-gradient(90deg,#00DBDE,#FC00FF);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+}
 
 # GROQ API
 client = Groq(
@@ -296,6 +333,15 @@ skills = [
 ]
 
 # FILE UPLOAD
+st.markdown("""
+<h2 style='text-align:center;'>
+📄 Upload Your Resume
+</h2>
+
+<p style='text-align:center;color:gray;'>
+Drag and drop your resume PDF here
+</p>
+""", unsafe_allow_html=True)
 uploaded_file = st.file_uploader(
     "📄 Upload Your Resume",
     type=["pdf"]
