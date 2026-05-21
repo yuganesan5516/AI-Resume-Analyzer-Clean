@@ -14,13 +14,6 @@ st.set_page_config(
 )
 
 # CUSTOM CSS
-st.set_page_config(
-    page_title="AI Resume Analyzer",
-    page_icon="🚀",
-    layout="wide"
-)
-
-# CUSTOM CSS
 st.markdown("""
 <style>
 
@@ -61,15 +54,8 @@ h1, h2, h3 {
     box-shadow: 0 0 25px rgba(0,219,222,0.8);
 }
 
-/* Text Input */
-.stTextInput input {
-    border-radius: 12px;
-    background-color: #1e293b;
-    color: white;
-    border: 1px solid #334155;
-}
-
-/* Text Area */
+/* Inputs */
+.stTextInput input,
 .stTextArea textarea {
     border-radius: 12px;
     background-color: #1e293b;
@@ -79,10 +65,20 @@ h1, h2, h3 {
 
 /* File Uploader */
 section[data-testid="stFileUploader"] {
-    background-color: #111827;
-    border-radius: 15px;
-    padding: 15px;
-    border: 1px solid #334155;
+    background: rgba(17, 24, 39, 0.8);
+    border: 2px dashed #00DBDE;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    transition: 0.3s;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0,219,222,0.2);
+}
+
+section[data-testid="stFileUploader"]:hover {
+    border: 2px dashed #FC00FF;
+    box-shadow: 0 0 30px rgba(252,0,255,0.4);
+    transform: scale(1.01);
 }
 
 /* Metric Cards */
@@ -92,21 +88,6 @@ section[data-testid="stFileUploader"] {
     padding: 20px;
     border-radius: 18px;
     box-shadow: 0 0 10px rgba(0,255,200,0.1);
-}
-
-/* Success Box */
-.stSuccess {
-    border-radius: 12px;
-}
-
-/* Error Box */
-.stError {
-    border-radius: 12px;
-}
-
-/* Info Box */
-.stInfo {
-    border-radius: 12px;
 }
 
 /* Scrollbar */
@@ -119,10 +100,7 @@ section[data-testid="stFileUploader"] {
     border-radius: 10px;
 }
 
-</style>
-""", unsafe_allow_html=True)
-/* MOBILE RESPONSIVE */
-
+/* Mobile Responsive */
 @media screen and (max-width: 768px) {
 
     h1 {
@@ -147,63 +125,27 @@ section[data-testid="stFileUploader"] {
         padding: 15px;
     }
 
-    section[data-testid="stSidebar"] {
-        width: 100% !important;
-    }
-
     .block-container {
         padding-top: 1rem;
         padding-left: 1rem;
         padding-right: 1rem;
     }
 
-    .stTextInput input,
-    .stTextArea textarea {
-        font-size: 16px;
+    section[data-testid="stFileUploader"] {
+        padding: 20px;
     }
 }
-/* MODERN FILE UPLOADER */
 
-section[data-testid="stFileUploader"] {
-    background: rgba(17, 24, 39, 0.8);
-    border: 2px dashed #00DBDE;
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    transition: 0.3s;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(0,219,222,0.2);
-}
-
-section[data-testid="stFileUploader"]:hover {
-    border: 2px dashed #FC00FF;
-    box-shadow: 0 0 30px rgba(252,0,255,0.4);
-    transform: scale(1.01);
-}
-
-/* Upload Text */
-
-section[data-testid="stFileUploader"] label div {
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-}
-
-/* Browse files button */
-
-section[data-testid="stFileUploader"] button {
-    background: linear-gradient(90deg,#00DBDE,#FC00FF);
-    color: white;
-    border-radius: 12px;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-}
+</style>
+""", unsafe_allow_html=True)
 
 # GROQ API
-client = Groq(
-    api_key=st.secrets["GROQ_API_KEY"]
-)
+try:
+    client = Groq(
+        api_key=st.secrets["GROQ_API_KEY"]
+    )
+except:
+    st.error("Groq API Key Missing")
 
 # SESSION
 if "logged_in" not in st.session_state:
@@ -332,7 +274,7 @@ skills = [
     "AI"
 ]
 
-# FILE UPLOAD
+# FILE UPLOAD TITLE
 st.markdown("""
 <h2 style='text-align:center;'>
 📄 Upload Your Resume
@@ -342,8 +284,10 @@ st.markdown("""
 Drag and drop your resume PDF here
 </p>
 """, unsafe_allow_html=True)
+
+# FILE UPLOADER
 uploaded_file = st.file_uploader(
-    "📄 Upload Your Resume",
+    "Upload Resume",
     type=["pdf"]
 )
 
@@ -369,7 +313,10 @@ if uploaded_file is not None:
 
     for page in pdf_reader.pages:
 
-        resume_text += page.extract_text()
+        text = page.extract_text()
+
+        if text:
+            resume_text += text
 
     # SHOW RESUME
     st.subheader("📄 Resume Content")
@@ -404,31 +351,25 @@ if uploaded_file is not None:
             missing_skills.append(skill)
 
     # METRICS
-    total_skills = len(skills)
-
     found_count = len(found_skills)
 
     missing_count = len(missing_skills)
 
-    m1, m2 = st.columns(2)
-    m3, m4 = st.columns(2)
+    m1, m2, m3, m4 = st.columns(4)
 
     with m1:
-
         st.metric(
             label="📊 ATS Score",
             value=f"{score}%"
         )
 
     with m2:
-
         st.metric(
             label="✅ Skills Found",
             value=found_count
         )
 
     with m3:
-
         st.metric(
             label="❌ Missing Skills",
             value=missing_count
@@ -450,104 +391,73 @@ if uploaded_file is not None:
             value=status
         )
 
-    # DASHBOARD
-    col1 = st.container()
-    col2 = st.container()
+    # ATS SCORE SECTION
+    st.subheader("📊 ATS Score")
 
-    # LEFT
-    with col1:
+    st.progress(score / 100)
 
-        st.subheader("📊 ATS Score")
+    st.metric(
+        label="Resume Match",
+        value=f"{score}%"
+    )
 
-        st.progress(score / 100)
+    # MATCHING SKILLS
+    st.subheader("✅ Matching Skills")
 
-        st.metric(
-            label="Resume Match",
-            value=f"{score}%"
-        )
+    for skill in found_skills:
 
         st.markdown(f"""
-        <div style="
-            background: linear-gradient(90deg,#00ffcc,#00cc66);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0px 0px 30px #00ffcc;
+        <span style="
+            background-color:#00cc66;
+            color:white;
+            padding:8px 15px;
+            border-radius:15px;
+            margin:5px;
+            display:inline-block;
+            font-weight:bold;
         ">
-
-        <h1 style='color:white;'>
-            Excellent Match 🔥
-        </h1>
-
-        <h2 style='color:white;'>
-            {score}% ATS Score
-        </h2>
-
-        </div>
+        {skill}
+        </span>
         """, unsafe_allow_html=True)
 
-    # RIGHT
-    with col2:
+    # MISSING SKILLS
+    st.subheader("❌ Missing Skills")
 
-        st.subheader("✅ Matching Skills")
+    for skill in missing_skills:
 
-        for skill in found_skills:
+        st.markdown(f"""
+        <span style="
+            background-color:#ff4b4b;
+            color:white;
+            padding:8px 15px;
+            border-radius:15px;
+            margin:5px;
+            display:inline-block;
+            font-weight:bold;
+        ">
+        {skill}
+        </span>
+        """, unsafe_allow_html=True)
 
-            st.markdown(f"""
-            <span style="
-                background-color:#00cc66;
-                color:white;
-                padding:8px 15px;
-                border-radius:15px;
-                margin:5px;
-                display:inline-block;
-                font-weight:bold;
-            ">
-            {skill}
-            </span>
-            """, unsafe_allow_html=True)
+    # PIE CHART
+    st.subheader("📊 Skills Analysis Chart")
 
-        st.subheader("❌ Missing Skills")
+    labels = ["Matched Skills", "Missing Skills"]
 
-        for skill in missing_skills:
+    sizes = [found_count, missing_count]
 
-            st.markdown(f"""
-            <span style="
-                background-color:#ff4b4b;
-                color:white;
-                padding:8px 15px;
-                border-radius:15px;
-                margin:5px;
-                display:inline-block;
-                font-weight:bold;
-            ">
-            {skill}
-            </span>
-            """, unsafe_allow_html=True)
+    fig, ax = plt.subplots()
 
-        # PIE CHART
-        st.subheader("📊 Skills Analysis Chart")
+    ax.pie(
+        sizes,
+        labels=labels,
+        autopct="%1.1f%%",
+        startangle=90
+    )
 
-        matched_count = len(found_skills)
+    ax.axis("equal")
 
-        missing_count = len(missing_skills)
-
-        labels = ["Matched Skills", "Missing Skills"]
-
-        sizes = [matched_count, missing_count]
-
-        fig, ax = plt.subplots()
-
-        ax.pie(
-            sizes,
-            labels=labels,
-            autopct="%1.1f%%",
-            startangle=90
-        )
-
-        ax.axis("equal")
-
-        st.pyplot(fig)
+    st.pyplot(fig)
 
     # BAR CHART
     st.subheader("📈 Skills Bar Chart")
@@ -577,7 +487,7 @@ if uploaded_file is not None:
 
         st.write("👉 Learn:", skill)
 
-    # AI ANALYZE BUTTON
+    # AI ANALYZE
     if st.button("🤖 Analyze Resume"):
 
         with st.spinner("Analyzing Resume..."):
@@ -601,11 +511,15 @@ if uploaded_file is not None:
                     job_description
                 )
 
-                result = analyze_resume(data)
+                try:
+                    result = analyze_resume(data)
+                    ai_feedback = result["feedback"]
+
+                except Exception as ai_error:
+                    st.error(f"AI Error: {ai_error}")
+                    st.stop()
 
                 st.subheader("🤖 AI Feedback")
-
-                ai_feedback = result["feedback"]
 
                 st.markdown(f"""
                 <div style="
@@ -622,15 +536,12 @@ if uploaded_file is not None:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # PDF
+                # PDF REPORT
                 pdf = FPDF()
 
                 pdf.add_page()
 
-                pdf.set_font(
-                    "Arial",
-                    size=16
-                )
+                pdf.set_font("Arial", size=16)
 
                 pdf.cell(
                     200,
@@ -642,10 +553,7 @@ if uploaded_file is not None:
 
                 pdf.ln(10)
 
-                pdf.set_font(
-                    "Arial",
-                    size=12
-                )
+                pdf.set_font("Arial", size=12)
 
                 pdf.cell(
                     200,
@@ -653,42 +561,6 @@ if uploaded_file is not None:
                     txt=f"ATS Score: {score}%",
                     ln=True
                 )
-
-                pdf.ln(5)
-
-                pdf.cell(
-                    200,
-                    10,
-                    txt="Detected Skills:",
-                    ln=True
-                )
-
-                for skill in found_skills:
-
-                    pdf.cell(
-                        200,
-                        10,
-                        txt=f"- {skill}",
-                        ln=True
-                    )
-
-                pdf.ln(5)
-
-                pdf.cell(
-                    200,
-                    10,
-                    txt="Missing Skills:",
-                    ln=True
-                )
-
-                for skill in missing_skills:
-
-                    pdf.cell(
-                        200,
-                        10,
-                        txt=f"- {skill}",
-                        ln=True
-                    )
 
                 pdf.ln(5)
 
